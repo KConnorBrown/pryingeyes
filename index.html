@@ -25,7 +25,7 @@ function fontRead(){
 }
 
 function preload() {
-    myFont = loadFont("Merriweather-BlackItalic.ttf", fontRead);
+    Merriweather_BI = loadFont("Merriweather-BlackItalic.ttf", fontRead);
 }
 
 function setup() {
@@ -40,7 +40,7 @@ function setup() {
         boxes[c] = [];
         for (var r = 0; r <=highCount; r++) {
             mods[index++] = new Module(int(c)*u,int(r)*u);
-            if (r > 0 && r < 8) {
+            if (r > 0 && r < highCount) {
                 boxes[c][r-1] = new TextBox(int(c)*u/2 - 10, (r-1)*u/2 + 15, c, r-1);
             }
         }
@@ -72,7 +72,7 @@ function draw() {
 
 
     if (fontReady) {
-        textFont(myFont);
+        textFont(Merriweather_BI);
         text("Hello World!", 10, 30);
     }
 
