@@ -1,16 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <style>
-    /* @import url(https://fonts.googleapis.com/css?family=Fjalla+One); */
-    <link href="https://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet">
-
-    .textBox {
-        font-family: 'Merriweather', serif;
-    }
     <meta charset="UTF-8">
     <title>Prying Eyes</title>
-    <script language="javascript" type="text/javascript" src="../p5.js"></script>
+    <script language="javascript" type="text/javascript" src="p5.js"></script>
     <script>
 var u;
 var l;
@@ -25,6 +18,15 @@ var wc = 0;
 var contents = '';
 var cc = 0;
 var cr = 0;
+var myFont, fontReady = false;
+
+function fontRead(){
+    fontReady = true;
+}
+
+function preload() {
+    myFont = loadFont("Merriweather-BlackItalic.ttf", fontRead);
+}
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -67,6 +69,14 @@ function draw() {
             boxes[c][r].draw();
         }
     }
+
+
+    if (fontReady) {
+        textFont(myFont);
+        text("Hello World!", 10, 30);
+    }
+
+
     // writeToPoem(contents, cc, cr);
 }
 
