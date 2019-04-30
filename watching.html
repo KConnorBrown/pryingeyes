@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    /* @import url(https://fonts.googleapis.com/css?family=Fjalla+One); */
+    <link href="https://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet">
+
+    .textBox {
+        font-family: 'Merriweather', serif;
+    }
+    <meta charset="UTF-8">
+    <title>Prying Eyes</title>
+    <script language="javascript" type="text/javascript" src="../p5.js"></script>
+    <script>
+var u;
+var l;
+var a;
+var mods = [];
+var boxes = [];
+var x;
+var y;
+var sl = 40;
+var count;
+var wc = 0;
+var contents = '';
+var cc = 0;
+var cr = 0;
+
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    u = 100;
+    l = 40;
+    var highCount = height/u;
+    var wideCount = width/u;
+    var index = 0;
+
+    for (var c = 0; c <=wideCount; c++) {
+        boxes[c] = [];
+        for (var r = 0; r <=highCount; r++) {
+            mods[index++] = new Module(int(c)*u,int(r)*u);
+            if (r > 0 && r < 8) {
+                boxes[c][r-1] = new TextBox(int(c)*u/2 - 10, (r-1)*u/2 + 15, c, r-1);
+            }
+        }
+    }
+    count = int(mods.length);
+    console.log(boxes);
+}
+
+function draw() {
+    if (mouseIsPressed) {
+        background(0);
+        stroke(255,163,163);
+    } else {
+        background(255);
+        stroke(255);
+    }
+    noStroke();
+    translate(20, 20);
+    for (var i = 0; i < count; i++) {
+        mods[i].update();
+        mods[i].draw1();
+        mods[i].draw2();
+    }
+    for (var c = 0; c < boxes.length; c++){
+        for (var r = 0; r < boxes[0].length; r++){
+            boxes[c][r].draw();
+        }
+    }
+    // writeToPoem(contents, cc, cr);
+}
+
+// function keyTyped() {
+//     contents += key;
+// }
+
+
+// function writeToPoem(_text, col, row) {
+//     push();
+//     fill(0);
+//     console.log(boxes[col][row].x + ', ' + boxes[col][row].y);
+//     translate(boxes[col][row].x, boxes[col][row].y +sl/1.80);
+//     textSize(15);
+//     text(_text, boxes[col][row].x, boxes[col][row].y, textWidth(_text));
+//     // if(boxes[col][row].tw >= 82.5) {
+//     //
+//     // }
+//     if (boxes[col][row].tw < textWidth(contents)){
+//             boxes[col][row].tw = textWidth(contents);
+//     }
+//     pop();
+// }
+
+function TextBox(_x, _y, _col, _row) {
+    this.x = _x;
+    this.y = _y;
+    this.c = _col;
+    this.r = _row;
+    this.tw = sl;
+}
+
+TextBox.prototype.draw = function() {
+    push();
+    wc = 255*(abs(this.c - 7)/7);
+    fill(255, 255, wc);
+    translate(this.x, this.y);
+    quad(this.x, this.y,
+         this.x+sl, this.y,
+         this.x+sl, this.y+sl,
+         this.x, this.y+sl);
+    pop();
+}
+
+function Module(_x, _y) {
+    this.x = _x;
+    this.y = _y;
+    this.a = 0;
+}
+
+Module.prototype.update = function() {
+    this.a = atan2(mouseY-this.y, mouseX-this.x);
+}
+
+Module.prototype.draw1 = function() {
+    push();
+    translate(this.x, this.y);
+    fill(255);
+    arc(0, -10, l, l, 0.5, PI-0.5);
+    arc(0, 10, l, l, PI+0.5, -0.5);
+    pop();
+}
+
+Module.prototype.draw2 = function() {
+    push();
+    translate(this.x, this.y);
+    rotate(this.a);
+    fill(0);
+    ellipse(8, 0, l/2, l/2);
+    pop();
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+    <style> body{padding:0; margin:0;} </style>
+  </head>
+  <body>
+  </body>
+</html>
