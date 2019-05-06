@@ -2,10 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="#" />
     <title>Prying Eyes</title>
-    <script language="javascript" type="text/javascript" src="p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.js"></script>
     <script>
 var u;
+var highCount;
+var wideCount;
 var l;
 var a;
 var mods = [];
@@ -14,39 +17,48 @@ var x;
 var y;
 var sl = 40;
 var count;
-var wc = 0;
+var time;
+// var wc = 0;
 var contents = '';
 var cc = 0;
 var cr = 0;
+var loadedd = 0;
+var wc = 0;
 var myFont, fontReady = false;
-
+var unitialized;
+var letters = [['W', 'H', 'E', 'R', 'E'], ['D', 'O', ' ', 'W', 'O', 'R', 'D', 'S'],
+ ['G', 'O'], ['W', 'H', 'E', 'N'], ['W', 'E'], ['F', 'A', 'L', 'L'], ['A', 'S', 'L',
+ 'E', 'E', 'P', '?']];
+var curr_word_i = 0;
 function fontRead(){
-    fontReady = true;
+        fontReady = true;
 }
 
 function preload() {
-    Merriweather_BI = loadFont("Merriweather-BlackItalic.ttf", fontRead);
+    Merriweather_BI = loadFont("Merriweather-BlackItalic.ttf");
+    rubikmono = loadFont("RubikMonoOne-Regular.ttf", fontRead);
 }
 
 function setup() {
+    time = millis();
     createCanvas(windowWidth, windowHeight);
     u = 100;
     l = 40;
-    var highCount = height/u;
-    var wideCount = width/u;
+    unitialized = true;
+    highCount = height/u;
+    wideCount = width/u;
     var index = 0;
-
     for (var c = 0; c <=wideCount; c++) {
         boxes[c] = [];
         for (var r = 0; r <=highCount; r++) {
-            mods[index++] = new Module(int(c)*u,int(r)*u);
+            mods[index] = new Module(int(c)*u,int(r)*u, index);
+            index++;
             if (r > 0 && r < highCount) {
                 boxes[c][r-1] = new TextBox(int(c)*u/2 - 10, (r-1)*u/2 + 15, c, r-1);
             }
         }
     }
     count = int(mods.length);
-    console.log(boxes);
 }
 
 function draw() {
@@ -59,72 +71,112 @@ function draw() {
     }
     noStroke();
     translate(20, 20);
-    for (var i = 0; i < count; i++) {
-        mods[i].update();
-        mods[i].draw1();
-        mods[i].draw2();
-    }
-    for (var c = 0; c < boxes.length; c++){
-        for (var r = 0; r < boxes[0].length; r++){
-            boxes[c][r].draw();
-        }
-    }
-
-
     if (fontReady) {
         textFont(Merriweather_BI);
-        text("Hello World!", 10, 30);
+        textSize(25);
+        for (var i = 0; i < count; i++) {
+            mods[i].update();
+            mods[i].draw1();
+            mods[i].draw2();
+        }
+        for (var c = 0; c < boxes.length; c++){
+            for (var r = 0; r < boxes[0].length; r++){
+                boxes[c][r].draw();
+            }
+        }
     }
-
-
-    // writeToPoem(contents, cc, cr);
+    if (time < 7500){
+        push();
+        var woff = 20;
+        var hoff = 45;
+        translate(0, 0);
+        textFont(rubikmono);
+        textSize(40);
+        textAlign(CENTER, CENTER);
+        fill(255, 0, 0);
+        text('Once you grab on, don\'t let go', width/2, height/2-75);
+        textSize(35);
+        if(0 <= time && time < 1500) {
+            text('5', width/2-woff, hoff);
+        } else if(1500<= time && time < 3000) {
+            text('4', width/2-woff, hoff);
+        } else if(3000<= time && time < 4500) {
+            text('3', width/2-woff, hoff);
+        } else if(4500<= time && time < 6000) {
+            text('2', width/2-woff, hoff);
+        } else if(6000<= time && time < 7500) {
+            text('1', width/2-woff, hoff);
+        }
+    }
+    time += (millis() - time);
 }
-
-// function keyTyped() {
-//     contents += key;
-// }
-
-
-// function writeToPoem(_text, col, row) {
-//     push();
-//     fill(0);
-//     console.log(boxes[col][row].x + ', ' + boxes[col][row].y);
-//     translate(boxes[col][row].x, boxes[col][row].y +sl/1.80);
-//     textSize(15);
-//     text(_text, boxes[col][row].x, boxes[col][row].y, textWidth(_text));
-//     // if(boxes[col][row].tw >= 82.5) {
-//     //
-//     // }
-//     if (boxes[col][row].tw < textWidth(contents)){
-//             boxes[col][row].tw = textWidth(contents);
-//     }
-//     pop();
-// }
 
 function TextBox(_x, _y, _col, _row) {
     this.x = _x;
     this.y = _y;
     this.c = _col;
     this.r = _row;
-    this.tw = sl;
+    this.tw = sl; //text width
+    this.letter = false;
+    this.center = [_x+sl/2, _y+sl/2]; //center of box
+}
+
+//decides where to place the word in horizontally
+function leftPack(word) {
+    return int(Math.random()*(wideCount-(word.length+1)));
 }
 
 TextBox.prototype.draw = function() {
     push();
-    wc = 255*(abs(this.c - 7)/7);
+    wc = 255*(abs(this.c - int(boxes.length/2))/int(boxes.length/2));
+    if (wc == 255) {wc = 240;}
     fill(255, 255, wc);
+    if (!unitialized) {
+        if (mouseIsPressed) {
+            if ((this.letter == false || this.letter == ' ')){
+                fill(0);
+            }
+        }
+    }
     translate(this.x, this.y);
     quad(this.x, this.y,
          this.x+sl, this.y,
          this.x+sl, this.y+sl,
          this.x, this.y+sl);
+    translate(this.center[0], this.center[1]);
+
+    if (unitialized) {
+        unitialized = false;
+        for(var i = 0; i < letters.length; i++){
+            var j = leftPack(letters[i]);
+            var k = 0;
+            while(k < letters[i].length){
+                boxes[j][i].letter = letters[i][k];
+                k += 1;
+                j += 1;
+            }
+        }
+    }
+    if (this.letter != false) {
+        if (mouseIsPressed) {
+            fill(0);
+            stroke(255, 0, 255);
+            strokeWeight(1.50);
+        } else {
+            noStroke();
+            fill(255, 255, wc);
+        }
+        textAlign(CENTER, CENTER);
+        text(this.letter, -2, -2);
+    }
     pop();
 }
 
-function Module(_x, _y) {
+function Module(_x, _y, index) {
     this.x = _x;
     this.y = _y;
     this.a = 0;
+    this.i = index;
 }
 
 Module.prototype.update = function() {
@@ -144,7 +196,20 @@ Module.prototype.draw2 = function() {
     push();
     translate(this.x, this.y);
     rotate(this.a);
-    fill(0);
+    // console.log(7500 + this.i*20);
+    if (time < 7500 + this.i*20){
+        console.log(7500 + this.i*20);
+        fill(255);
+    } else if (time < 12000 && time > 9880 + this.i*10) {
+        console.log(9880 + this.i*10);
+        if(this.i % 16 > 7){
+            fill(255,0,0);
+        } else{
+            fill(0);
+        }
+    } else {
+        fill(0);
+    }
     ellipse(8, 0, l/2, l/2);
     pop();
 }
