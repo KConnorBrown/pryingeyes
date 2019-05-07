@@ -10,25 +10,225 @@ var u;
 var highCount;
 var wideCount;
 var l;
+var blackOutTime = 0;
 var a;
+var numPress = 0;
 var mods = [];
 var boxes = [];
 var x;
+var flockTime;
+var numNoPress = 1;
 var y;
 var sl = 40;
 var count;
 var time;
+var flock = 0;
+var txtstr = 'instructions';
 // var wc = 0;
 var contents = '';
+var rc = 0;
 var cc = 0;
+var flock2;
 var cr = 0;
 var loadedd = 0;
 var wc = 0;
 var myFont, fontReady = false;
 var unitialized;
+var textheight = 0; // height/2-75;
+var textwidth;
+var words = ['scrambling', 'shilling', 'seething', 'glimpse', 'miraculous', 'wasp', 'moonlight', 'twig',
+'frightened',
+'towering',
+'dazzling',
+'glinting',
+'curving',
+'tremendous',
+'magnet',
+'bulging',
+'furry',
+'bolt',
+'horror',
+'grasshopper',
+'spider',
+'ladybug',
+'centipede',
+'earthworm',
+'hammock',
+'pale',
+'frantically',
+'desolate',
+'repulsive',
+'slithering',
+'hedges',
+'stampeding',
+'vast',
+'awkward',
+'perish',
+'wail',
+'dreadfully',
+'enormous',
+'scrumptious',
+'cruising',
+'aghast',
+'pandemonium',
+'squealing',
+'peer',
+'astonished',
+'gape',
+'trousers',
+'colossal',
+'mammoth',
+'swaying',
+'bowing',
+'spellbound',
+'inferior',
+'tummy',
+'inspect',
+'hypnotized',
+'nasty',
+'dwarf',
+'temper',
+'orchard',
+'poisonous',
+'cocky',
+'sniffing',
+'fractals',
+'context',
+'truncated',
+'becoming',
+'brood',
+'bungalow',
+'conflate',
+'demure',
+'denouement',
+'diaphanous',
+'dissemble',
+'dulcet',
+'ebullience',
+'bubbly',
+'effervescent',
+'elixir',
+'eloquence',
+'emrocation',
+'epiphany',
+'erstwhile',
+'ethereal',
+'evanescent',
+'evocative',
+'fetching',
+'furtive',
+'gossamer',
+'dripping',
+'icy',
+'imbue',
+'incipient',
+'ineffable',
+'labyrinthine',
+'lagoon',
+'languor',
+'leisure',
+'lilt',
+'lithe',
+'love',
+'opalescent',
+'coniferous',
+'iris',
+'infrastructure',
+'panacea',
+'panopticon',
+'propensity',
+'soliloquy',
+'suffuse',
+'chord',
+'vestigial',
+'liminal',
+'fruity',
+'camp',
+'notes',
+'collateral',
+'balcony',
+'joy',
+'fury',
+'moment',
+'you',
+'love',
+'family',
+'flood',
+'floorboards',
+'river',
+'reaching',
+'dark',
+'summer',
+'in',
+'far',
+'fall',
+'hurt',
+'mountain',
+'down',
+'tabernacle',
+'tavern',
+'hands',
+'ghosted',
+'dream',
+'saw',
+'push',
+'against',
+'so',
+'machine',
+'end',
+'of',
+'neighborhood',
+'sweet',
+'boys',
+'cars',
+'girls',
+'suburbia',
+'weekend',
+'islands',
+'cool',
+'trying',
+'spakr',
+'fool',
+'tragedy',
+'cigarettes',
+'heart',
+'sold',
+'drama',
+'comedy',
+'affair',
+'like',
+'philology',
+'alien',
+'superstar',
+'body',
+'spine',
+'planet',
+'revolving',
+'sleep',
+'impossible',
+'faraway',
+'need',
+'breathe',
+'worked',
+'baby',
+'vain',
+'ache',
+'crystalline',
+'crystallized',
+'summarization',
+'suscript',
+'subtitles',
+'submarine',
+'marina',
+'aquarium',
+'aquamarine'
+];
+
 var letters = [['W', 'H', 'E', 'R', 'E'], ['D', 'O', ' ', 'W', 'O', 'R', 'D', 'S'],
  ['G', 'O'], ['W', 'H', 'E', 'N'], ['W', 'E'], ['F', 'A', 'L', 'L'], ['A', 'S', 'L',
  'E', 'E', 'P', '?']];
+var letters2 = [['I', 'D', 'K'], ['D', 'O', ' ', 'U', '?'], ['I', 'D', 'K'], ['I', 'D', 'K'],
+['D', 'O', ' ', 'U', '?'], ['I', 'D', 'K'], ['I', 'D', 'K']];
 var curr_word_i = 0;
 function fontRead(){
         fontReady = true;
@@ -36,6 +236,8 @@ function fontRead(){
 
 function preload() {
     Merriweather_BI = loadFont("Merriweather-BlackItalic.ttf");
+    nunito_bold = loadFont('../fonts/Nunito/Nunito-Regular.ttf');
+    montserrat_med = loadFont('../fonts/Montserrat/Montserrat-Medium.ttf');
     rubikmono = loadFont("RubikMonoOne-Regular.ttf", fontRead);
 }
 
@@ -47,6 +249,7 @@ function setup() {
     unitialized = true;
     highCount = height/u;
     wideCount = width/u;
+    textwidth = width/2
     var index = 0;
     for (var c = 0; c <=wideCount; c++) {
         boxes[c] = [];
@@ -63,11 +266,31 @@ function setup() {
 
 function draw() {
     if (mouseIsPressed) {
+        if(numPress == 0){
+            flockTime = time + 2000;
+        }
+        if(numPress == 1 && numNoPress == 2 && blackOutTime == 0){
+            blackOutTime = time + 6000;
+        }
+        numPress = numNoPress;
         background(0);
         stroke(255,163,163);
     } else {
+        if (numPress == numNoPress) {
+            numNoPress += 1;
+            letters = letters2;
+            unitialized = true;
+            for(var c = 0; c < boxes.length; c++){
+                for(var r =  0; r < boxes[0].length; r++){
+                    boxes[c][r].letter = false;
+                }
+            }
+        }
         background(255);
         stroke(255);
+    }
+    if(numPress > 2 &&!mouseIsPressed){
+        background('#202020');
     }
     noStroke();
     translate(20, 20);
@@ -91,24 +314,122 @@ function draw() {
         var hoff = 45;
         translate(0, 0);
         textFont(rubikmono);
-        textSize(40);
-        textAlign(CENTER, CENTER);
-        fill(255, 0, 0);
-        text('Once you grab on, don\'t let go', width/2, height/2-75);
         textSize(35);
+        textAlign(CENTER, CENTER);
+        fill(255-rc, 0, 0);
+        text(txtstr, textwidth, textheight);
+        textSize(35);
+        textheight += 1;
+        var winc = 2;
         if(0 <= time && time < 1500) {
             text('5', width/2-woff, hoff);
+            if (time < 1200){
+                textheight = 0;
+                textwidth += winc;
+            } else {
+                textheight += 0.1;
+                textwidth -= 2*winc;
+            }
+
         } else if(1500<= time && time < 3000) {
             text('4', width/2-woff, hoff);
+            txtstr = 'press press press';
+            if (time <= 2700) {
+                textheight = 100;
+                textwidth -= winc;
+            } else {
+                textheight += 0.1;
+                textwidth += 2*winc;
+
+            }
         } else if(3000<= time && time < 4500) {
             text('3', width/2-woff, hoff);
+            if (time <= 4200){
+                textheight = 200;
+                textwidth += winc;
+            } else {
+                textheight += 0.1;
+                textwidth -= 2*winc;
+            }
+            txtstr = 'hold hold hold';
         } else if(4500<= time && time < 6000) {
             text('2', width/2-woff, hoff);
+            txtstr = 'watch watch watch';
+            if (time < 5700) {
+                textheight = 300;
+                textwidth -= winc;
+            } else {
+                textheight += 0.1;
+                textwidth += 2*winc;
+            }
         } else if(6000<= time && time < 7500) {
             text('1', width/2-woff, hoff);
+            txtstr = 'ready?';
+            rc += 3;
+            textheight = 400;
+            if (time < 7500) {
+                // textheight += 3.5;
+                textwidth += 4.5*winc;
+            } else {
+                textwidth += 4.5*winc;
+            }
         }
+        pop();
     }
     time += (millis() - time);
+    switch (numPress){
+        case 1:
+            if (flock==0 && time > flockTime){
+                flock = new Flock();
+                // Add an initial set of boids into the system
+                push();
+                fill(255);
+                var len = words.length;
+                for (var i = 0; i < len; i++) {
+                    flock.addBoid(new Boid(width/4,height/4, randomWord()));
+                }
+                pop();
+            }
+            if (flock != 0 && mouseIsPressed){
+                flock.run();
+            }
+            break;
+        case 2:
+            letters = letters2
+        default:
+            break;
+    }
+    if(numPress == 2 && time > blackOutTime && mouseIsPressed){
+        push();
+        translate(0,0);
+        fill(0);
+        rect(-20, -20, width+20, height+20);
+        pop();
+    }
+    if(numPress > 2 && mouseIsPressed) {
+        push();
+        translate(0,0);
+        fill(0);
+        rect(-20, -20, width+20, height+20);
+        pop();
+    }
+
+    if(numPress > 2 && !mouseIsPressed) {
+        background('#C0C0C0');
+        for(var i = 0; i < boxes.length; i++){
+            for(var j = 0; j < boxes[0].length; j++){
+                boxes[i][j].fill = 'black';
+                boxes[i][j].draw();
+            }
+        }
+    }
+}
+
+function randomWord() {
+    //shuffle array of words
+    // shuffle(words);
+    return words.pop();
+    //pop random word and return
 }
 
 function TextBox(_x, _y, _col, _row) {
@@ -116,6 +437,7 @@ function TextBox(_x, _y, _col, _row) {
     this.y = _y;
     this.c = _col;
     this.r = _row;
+    this.fill = false;
     this.tw = sl; //text width
     this.letter = false;
     this.center = [_x+sl/2, _y+sl/2]; //center of box
@@ -131,6 +453,9 @@ TextBox.prototype.draw = function() {
     wc = 255*(abs(this.c - int(boxes.length/2))/int(boxes.length/2));
     if (wc == 255) {wc = 240;}
     fill(255, 255, wc);
+    if (this.fill != false){
+        fill(0+wc, 0+wc, 0+wc);
+    }
     if (!unitialized) {
         if (mouseIsPressed) {
             if ((this.letter == false || this.letter == ' ')){
@@ -165,6 +490,11 @@ TextBox.prototype.draw = function() {
         } else {
             noStroke();
             fill(255, 255, wc);
+            if(this.fill != 'false' && numNoPress > 2 && numPress >= 3){
+                fill('yellow');
+                stroke('blue');
+                strokeWeight(2);
+            }
         }
         textAlign(CENTER, CENTER);
         text(this.letter, -2, -2);
@@ -196,12 +526,9 @@ Module.prototype.draw2 = function() {
     push();
     translate(this.x, this.y);
     rotate(this.a);
-    // console.log(7500 + this.i*20);
     if (time < 7500 + this.i*20){
-        console.log(7500 + this.i*20);
         fill(255);
     } else if (time < 12000 && time > 9880 + this.i*10) {
-        console.log(9880 + this.i*10);
         if(this.i % 16 > 7){
             fill(255,0,0);
         } else{
@@ -212,6 +539,195 @@ Module.prototype.draw2 = function() {
     }
     ellipse(8, 0, l/2, l/2);
     pop();
+}
+
+// The Nature of Code
+// Daniel Shiffman
+// http://natureofcode.com
+
+// Boid class
+// Methods for Separation, Cohesion, Alignment added
+
+function Boid(x,y, w) {
+  this.acceleration = createVector(0,0);
+  this.velocity = createVector(random(-1,1),random(-1,1));
+  this.position = createVector(x,y);
+  this.r = 2.0;
+  this.word = w;
+  this.maxspeed = 4;    // Maximum speed
+  this.maxforce = 0.03; // Maximum steering force
+  this.run = function(boids) {
+    this.flock(boids);
+    this.update();
+    this.borders();
+    this.render();
+  }
+
+  this.applyForce = function(force) {
+    // We could add mass here if we want A = F / M
+    this.acceleration.add(force);
+  }
+
+  // We accumulate a new acceleration each time based on three rules
+  this.flock = function(boids) {
+    var sep = this.separate(boids);   // Separation
+    var ali = this.align(boids);      // Alignment
+    var coh = this.cohesion(boids);   // Cohesion
+    // Arbitrarily weight these forces
+    sep.mult(1.75);
+    ali.mult(1.0);
+    coh.mult(1.0);
+    // Add the force vectors to acceleration
+    this.applyForce(sep);
+    this.applyForce(ali);
+    this.applyForce(coh);
+  }
+
+  // Method to update location
+  this.update = function() {
+    // Update velocity
+    this.velocity.add(this.acceleration);
+    // Limit speed
+    this.velocity.limit(this.maxspeed);
+    this.position.add(this.velocity);
+    // Reset accelertion to 0 each cycle
+    this.acceleration.mult(0);
+  }
+
+  // A method that calculates and applies a steering force towards a target
+  // STEER = DESIRED MINUS VELOCITY
+  this.seek = function(target) {
+    var desired = p5.Vector.sub(target,this.position);  // A vector pointing from the location to the target
+    // Normalize desired and scale to maximum speed
+    desired.normalize();
+    desired.mult(this.maxspeed);
+    // Steering = Desired minus Velocity
+    var steer = p5.Vector.sub(desired,this.velocity);
+    steer.limit(this.maxforce);  // Limit to maximum steering force
+    return steer;
+  }
+
+  this.render = function() {
+    // Draw a triangle rotated in the direction of velocity
+    var theta = this.velocity.heading() + radians(90);
+    fill(200,100);
+    stroke(255);
+    push();
+    translate(this.position.x,this.position.y);
+    fill(0,255,255, 191);
+    // fill(255);
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    // textFont(nunito_bold);
+    textFont(montserrat_med);
+    text(this.word, this.position.x, this.position.y);
+    pop();
+  }
+
+  // Wraparound
+  this.borders = function() {
+    if (this.position.x < -this.r)  this.position.x = width +this.r;
+    if (this.position.y < -this.r)  this.position.y = height+this.r;
+    if (this.position.x > width +this.r) this.position.x = -this.r;
+    if (this.position.y > height+this.r) this.position.y = -this.r;
+  }
+
+  // Separation
+  // Method checks for nearby boids and steers away
+  this.separate = function(boids) {
+    var desiredseparation = 25.0;
+    var steer = createVector(0,0);
+    var count = 0;
+    // For every boid in the system, check if it's too close
+    for (var i = 0; i < boids.length; i++) {
+      var d = p5.Vector.dist(this.position,boids[i].position);
+      // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
+      if ((d > 0) && (d < desiredseparation)) {
+        // Calculate vector pointing away from neighbor
+        var diff = p5.Vector.sub(this.position,boids[i].position);
+        diff.normalize();
+        diff.div(d);        // Weight by distance
+        steer.add(diff);
+        count++;            // Keep track of how many
+      }
+    }
+    // Average -- divide by how many
+    if (count > 0) {
+      steer.div(count);
+    }
+
+    // As long as the vector is greater than 0
+    if (steer.mag() > 0) {
+      // Implement Reynolds: Steering = Desired - Velocity
+      steer.normalize();
+      steer.mult(this.maxspeed);
+      steer.sub(this.velocity);
+      steer.limit(this.maxforce);
+    }
+    return steer;
+  }
+
+  // Alignment
+  // For every nearby boid in the system, calculate the average velocity
+  this.align = function(boids) {
+    var neighbordist = 50;
+    var sum = createVector(0,0);
+    var count = 0;
+    for (var i = 0; i < boids.length; i++) {
+      var d = p5.Vector.dist(this.position,boids[i].position);
+      if ((d > 0) && (d < neighbordist)) {
+        sum.add(boids[i].velocity);
+        count++;
+      }
+    }
+    if (count > 0) {
+      sum.div(count);
+      sum.normalize();
+      sum.mult(this.maxspeed);
+      var steer = p5.Vector.sub(sum,this.velocity);
+      steer.limit(this.maxforce);
+      return steer;
+    } else {
+      return createVector(0,0);
+    }
+  }
+
+  // Cohesion
+  // For the average location (i.e. center) of all nearby boids, calculate steering vector towards that location
+  this.cohesion = function(boids) {
+    var neighbordist = 50;
+    var sum = createVector(0,0);   // Start with empty vector to accumulate all locations
+    var count = 0;
+    for (var i = 0; i < boids.length; i++) {
+      var d = p5.Vector.dist(this.position,boids[i].position);
+      if ((d > 0) && (d < neighbordist)) {
+        sum.add(boids[i].position); // Add location
+        count++;
+      }
+    }
+    if (count > 0) {
+      sum.div(count);
+      return this.seek(sum);  // Steer towards the location
+    } else {
+      return createVector(0,0);
+    }
+  }
+}
+
+// The Flock (a list of Boid objects)
+function Flock() {
+  // An array for all the boids
+  this.boids = []; // Initialize the array
+
+  this.run = function() {
+    for (var i = 0; i < this.boids.length; i++) {
+      this.boids[i].run(this.boids);  // Passing the entire list of boids to each boid individually
+    }
+  }
+
+  this.addBoid = function(b) {
+    this.boids.push(b);
+  }
 }
 
 function windowResized() {
