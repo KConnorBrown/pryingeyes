@@ -333,7 +333,7 @@ function draw() {
 
         } else if(1500<= time && time < 3000) {
             text('4', width/2-woff, hoff);
-            txtstr = 'press press press';
+            txtstr = 'press';
             if (time <= 2700) {
                 textheight = 100;
                 textwidth -= winc;
@@ -351,10 +351,10 @@ function draw() {
                 textheight += 0.1;
                 textwidth -= 2*winc;
             }
-            txtstr = 'hold hold hold';
+            txtstr = 'hold';
         } else if(4500<= time && time < 6000) {
             text('2', width/2-woff, hoff);
-            txtstr = 'watch watch watch';
+            txtstr = 'watch';
             if (time < 5700) {
                 textheight = 300;
                 textwidth -= winc;
